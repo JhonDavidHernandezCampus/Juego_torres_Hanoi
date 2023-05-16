@@ -26,9 +26,10 @@ function click3 (){
 
 function click(cuadro){
     if(cuadro.elegido){
-
+        selecionarOrigenDestino(cuadro);
     }else{
-
+        cuadro.caja.style.borderColor = "black";
+        reiniciarOrigenDestino();
     }
     //(cuadro.elegido)?: 
 }
@@ -60,6 +61,40 @@ function Cuadro(cIni){
             return false;
         } else {
             return true;
+        }
+    };
+    this.obtenerFichaSuperior = function(){
+        for(let i=0; i < this.contenido.length; i++ ){
+            if(!(this.contenido[i] instanceof Relleno)){
+                return this.contenido[i];
+            }
+        }
+    };
+    this.quitarFichaSuperior = function(){
+        for(let i=0; i > this.contenido.length; i++){
+            if(!(this.contenido[i] instanceof Relleno)){
+                fichaSelecionada = this.contenido[i];
+                this.contenido = new Relleno();
+                break;
+            }
+        }
+    };
+    this.insertarFichaSuperios = function(){
+        for( let i = this.contenido.length - 1; i>=0;i--){
+            if(this.contenido[i] instanceof Relleno){
+                this.contenido[i] = fichaSelecionada;
+                break;
+            }
+        }
+    };
+    this.resdibijarCaja = function(){
+        while (this.caja.hasChildNodes()){
+            this.caja.removeChild(this.caja.lastChild);
+        }
+        for(var i = 0; i < this.contenido.length; i++){
+            console.log(this.contenido[i].caja);
+            this.caja.appendChild(this.contenido[i].caja);
+
         }
     };
 }
@@ -96,6 +131,7 @@ function FichaS(){
     this.caja.style.backgroundColor = "#324";
     this.caja.style.marginLeft = "auto";
     this.caja.style.marginRight = "auto"
+    this.valor = 0;
 }
 function FichaM(){
     this.caja = crearDiv();
@@ -104,6 +140,7 @@ function FichaM(){
     this.caja.style.backgroundColor = "#6666";
     this.caja.style.marginLeft = "auto";
     this.caja.style.marginRight = "auto";
+    this.valor = 1;
 }
 function FichaL(){
     this.caja = crearDiv();
@@ -112,6 +149,7 @@ function FichaL(){
     this.caja.style.backgroundColor = "#777";
     this.caja.style.marginLeft = "auto";
     this.caja.style.marginRight = "auto"
+    this.valor = 2;
 }
 function FichaXL(){
     this.caja = crearDiv();
@@ -120,6 +158,7 @@ function FichaXL(){
     this.caja.style.backgroundColor = "#821";
     this.caja.style.marginLeft = "auto";
     this.caja.style.marginRight = "auto"
+    this.valor = 3;
 }
 function Relleno(){
     this.caja = crearDiv();
@@ -127,6 +166,46 @@ function Relleno(){
     this.caja.style.height = altura;
 }
 
+function selecionarOrigenDestino(cuadro){
+    if(origen == undefined){
+        if(cuadro.tieneFichas()){
+            cuadro.caja.style.borderColor = "red";
+            origen=cuadro;
+            origen.elegido = true;
+        }
+    }else if(origen != undefined && destino == undefined){
+        destino = cuadro;
+        destino.elegido = true;
+        
+        if(origen != destino ){
+            if(!destino.tieneFichas() || (origen.obtenerFichaSuperior().valor > destino.obtenerFichaSuperior().valor)){
+                origen.quitarFichaSuperior();
+                origen.resdibijarCaja();
+                destino.insertarFichaSuperios();
+                destino.resdibijarCaja();
+            }
+        }
+    }
+    if(destino != undefined && origen != undefined){
+        reiniciarOrigenDestino();
+    }
+}
+
+function reiniciarOrigenDestino(){
+    if(origen != undefined){
+        origen.caja.style.borderColor = "black";
+        origen.elegido = false;
+    }
+    if(destino != undefined){
+        destino.caja.style.borderColor = "black";
+        destino.elegido = false;
+    }
+    origen = undefined;
+    destino = undefined;
+    cuadro1.elegido = false;
+    cuadro2.elegido = false;
+    cuadro3.elegido = false;
+}
 
 function iniciar(){
     cuerpo = document.getElementsByTagName("body")[0];
